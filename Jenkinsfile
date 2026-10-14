@@ -24,13 +24,18 @@ pipeline {
             steps {
                 sh '''
                     docker rm -f retail-analytics || true
+
                     docker run -d \
                       --name retail-analytics \
                       --restart unless-stopped \
-                      -p 3000:3000 \
+                      -p 3000:8000 \
                       retail-analytics:latest
-                    sleep 5
-                    curl -f http://localhost:3000/
+
+                    sleep 10
+
+                    curl --retry 5 --retry-delay 2 \
+                      --retry-connrefused \
+                      -f http://localhost:3000/
                 '''
             }
         }
